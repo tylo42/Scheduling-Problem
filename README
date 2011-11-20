@@ -1,1 +1,15 @@
-TODO
+The goal of this project is to solve generalized shceduling problems.
+
+The scheduling problem has the following constraints:
+ * x people per group
+ * y groups
+ * z rounds
+where each person is in the same group with another between m and n times.
+
+For example, let's have three groups of two where everyone is in everyone elses group exactly once in 5 rounds.  Assing leters to people A-F a solution would be
+
+Round 1: {A, B} {C, D} {E, F}
+Round 2: {A, C} {B, E} {D, F}
+Round 3: {A, D} {B, F} {C, E}
+Round 4: {A, E} {B, D} {C, F}
+Round 5: {A, F} {B, C} {D, F}
