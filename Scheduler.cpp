@@ -9,7 +9,9 @@ Scheduler::Scheduler(size_t people, size_t groups) : m_people(people), m_groups(
    // for now assume only everyone with everyone else exactly once
    m_rounds = ((m_people * m_groups) - 1) / (m_people - 1);
    ASSERT((m_rounds * (m_people - 1) + 1) == (m_people * m_groups)); // Fix for cases like this to find best solution
+#ifdef DEBUG
    std::cout << m_rounds << std::endl;
+#endif
    group_combinations();
 }
 
@@ -28,8 +30,6 @@ void Scheduler::solve() const {
    ASSERT(round.size() == m_groups);
 
    schedule.push_back(round);
-   print(schedule);
-
    solve(schedule);
 }
 

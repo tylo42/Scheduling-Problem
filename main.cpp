@@ -6,6 +6,6 @@
 #include <iostream>
 
 int main() {
-   Scheduler s(2, 3);
+   Scheduler s(2, 10);
    s.solve();
 }
