@@ -10,7 +10,7 @@ Scheduler::Scheduler(size_t people, size_t groups) : m_people(people), m_groups(
    m_rounds = ((m_people * m_groups) - 1) / (m_people - 1);
    ASSERT((m_rounds * (m_people - 1) + 1) == (m_people * m_groups)); // Fix for cases like this to find best solution
 #ifdef DEBUG
-   std::cout << m_rounds << std::endl;
+   std::cout << "Required Rounds: " << m_rounds << std::endl;
 #endif
    group_combinations();
 }
@@ -34,10 +34,6 @@ void Scheduler::solve() const {
 }
 
 void Scheduler::solve(schedule_type & schedule) const {
-#ifdef DEBUG
-   print(schedule);
-   std::cout << std::endl;
-#endif
    if(m_rounds == schedule.size()) {
       // we have a solution
       std::cout << "Solution: " << std::endl;
@@ -113,9 +109,6 @@ void Scheduler::pairs(const group_type & group, pair_set & pairs) const {
 void Scheduler::group_combinations() {
    group_type group(m_people);
    group_combinations(group, 0, 1);
-#ifdef DEBUG
-   std::cout << m_all_groups.size() << std::endl;
-#endif
 }
 
 void Scheduler::group_combinations(group_type & group, size_t cur, size_t depth) {
@@ -123,10 +116,6 @@ void Scheduler::group_combinations(group_type & group, size_t cur, size_t depth)
    for(size_t i=cur; i<max; i++) {
       group.at(depth-1) = i;
       if(depth == m_people) {
-#ifdef DEBUG
-         std::for_each(group.begin(), group.end(), [](int n) -> void { std::cout << "[" << n << "] "; });
-         std::cout << std::endl;
-#endif
          m_all_groups.push_back(group);
       } else {
          group_combinations(group, i+1, depth+1);
