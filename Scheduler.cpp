@@ -12,10 +12,21 @@ Scheduler::Scheduler(size_t people, size_t groups) : m_people(people), m_groups(
 #ifdef DEBUG
    std::cout << "Required Rounds: " << m_rounds << std::endl;
 #endif
-   group_combinations();
 }
 
 size_t Scheduler::solve() const {
+   // A set of groups ordered by the group members
+   group_set group_comb([](const group_type & u, const group_type & v) -> bool {
+      ASSERT(u.size() == v.size());
+      for(size_t i=0; i<u.size(); i++) {
+         if(u[i] < v[i]) {
+            return true;
+         }
+      }
+      return false;
+   });
+   group_combinations(group_comb);
+
    schedule_type schedule;
    round_type round;
    int cur = 0;
@@ -30,10 +41,10 @@ size_t Scheduler::solve() const {
    ASSERT(round.size() == m_groups);
 
    schedule.push_back(round);
-   return solve(schedule);
+   return solve(schedule, group_comb);
 }
 
-size_t Scheduler::solve(schedule_type & schedule) const {
+size_t Scheduler::solve(schedule_type & schedule, group_set & group_comb) const {
    if(m_rounds == schedule.size()) {
       // we have a solution
       std::cout << "Solution: " << std::endl;
@@ -43,21 +54,23 @@ size_t Scheduler::solve(schedule_type & schedule) const {
    }
 
    round_type round;
-   return solve(schedule, round, m_all_groups.begin());
+   return solve(schedule, round, group_comb, group_comb.begin());
 }
 
-size_t Scheduler::solve(schedule_type & schedule, round_type & round, std::vector<group_type>::const_iterator cur) const {
+size_t Scheduler::solve(schedule_type & schedule, round_type & round, group_set & group_comb, group_set::const_iterator cur) const {
    size_t solutions = 0;
-   for(; cur != m_all_groups.end(); ++cur) {
+   for(; cur != group_comb.end(); ++cur) {
       if(!valid_group(*cur, round)) continue;
       if(!valid_group(*cur, schedule)) continue;
       round.push_back(*cur);
       if(round.size() == m_groups) {
          schedule.push_back(round);
-         solutions += solve(schedule);
+         solutions += solve(schedule, group_comb);
          schedule.pop_back();
       } else {
-         solutions += solve(schedule, round, cur+1);
+         cur++;
+         solutions += solve(schedule, round, group_comb, cur);
+         cur--;
       }
       round.pop_back();
    }
@@ -109,19 +122,19 @@ void Scheduler::pairs(const group_type & group, pair_set & pairs) const {
    }
 }
 
-void Scheduler::group_combinations() {
+void Scheduler::group_combinations(group_set & group_comb) const {
    group_type group(m_people);
-   group_combinations(group, 0, 1);
+   group_combinations(group_comb, group, 0, 1);
 }
 
-void Scheduler::group_combinations(group_type & group, size_t cur, size_t depth) {
+void Scheduler::group_combinations(group_set & group_comb, group_type & group, size_t cur, size_t depth) const {
    size_t max = ((m_groups - 1) * m_people) + depth;
    for(size_t i=cur; i<max; i++) {
       group.at(depth-1) = i;
       if(depth == m_people) {
-         m_all_groups.push_back(group);
+         group_comb.insert(group);
       } else {
-         group_combinations(group, i+1, depth+1);
+         group_combinations(group_comb, group, i+1, depth+1);
       }
    }
 }
