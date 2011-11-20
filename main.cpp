@@ -6,6 +6,6 @@
 #include <iostream>
 
 int main() {
-   Scheduler s(2, 3);
-   s.solve();
+   Scheduler s(2, 2);
+   std::cout << s.solve() << std::endl;
 }

@@ -15,7 +15,7 @@ Scheduler::Scheduler(size_t people, size_t groups) : m_people(people), m_groups(
    group_combinations();
 }
 
-void Scheduler::solve() const {
+size_t Scheduler::solve() const {
    schedule_type schedule;
    round_type round;
    int cur = 0;
@@ -30,35 +30,38 @@ void Scheduler::solve() const {
    ASSERT(round.size() == m_groups);
 
    schedule.push_back(round);
-   solve(schedule);
+   return solve(schedule);
 }
 
-void Scheduler::solve(schedule_type & schedule) const {
+size_t Scheduler::solve(schedule_type & schedule) const {
    if(m_rounds == schedule.size()) {
       // we have a solution
       std::cout << "Solution: " << std::endl;
       print(schedule);
       std::cout << std::endl;
+      return 1;
    }
 
    round_type round;
-   solve(schedule, round, m_all_groups.begin());
+   return solve(schedule, round, m_all_groups.begin());
 }
 
-void Scheduler::solve(schedule_type & schedule, round_type & round, std::vector<group_type>::const_iterator cur) const {
+size_t Scheduler::solve(schedule_type & schedule, round_type & round, std::vector<group_type>::const_iterator cur) const {
+   size_t solutions = 0;
    for(; cur != m_all_groups.end(); ++cur) {
       if(!valid_group(*cur, round)) continue;
       if(!valid_group(*cur, schedule)) continue;
       round.push_back(*cur);
       if(round.size() == m_groups) {
          schedule.push_back(round);
-         solve(schedule);
+         solutions += solve(schedule);
          schedule.pop_back();
       } else {
-         solve(schedule, round, cur+1);
+         solutions += solve(schedule, round, cur+1);
       }
       round.pop_back();
    }
+   return solutions;
 }
 
 bool Scheduler::valid_group(const group_type & group, const round_type & round) const {

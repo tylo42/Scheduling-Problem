@@ -14,12 +14,14 @@ private:
 
 public:
    Scheduler(size_t people, size_t groups);
-   void solve() const;
+
+   // Solve for a schedule with given constraints, returns number of solutions found
+   size_t solve() const;
 
 private:
    // Helper functions
-   void solve(schedule_type & schedule) const;
-   void solve(schedule_type & schedule, round_type & round, std::vector<group_type>::const_iterator cur) const;
+   size_t solve(schedule_type & schedule) const;
+   size_t solve(schedule_type & schedule, round_type & round, std::vector<group_type>::const_iterator cur) const;
 
    bool valid_group(const group_type & group, const round_type & round) const;
    bool valid_group(const group_type & group, const schedule_type & schedule) const;
