@@ -30,9 +30,6 @@ size_t Scheduler::solve() const {
    });
 
    group_combinations(group_comb);
-   for(group_set::const_iterator it = group_comb.begin(); it != group_comb.end(); ++it) {
-      print(*it); std::cout << std::endl;
-   }
 
    schedule_type schedule;
    round_type round;
