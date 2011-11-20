@@ -21,11 +21,18 @@ size_t Scheduler::solve() const {
       for(size_t i=0; i<u.size(); i++) {
          if(u[i] < v[i]) {
             return true;
+         } else if(u[i] > v[i]) {
+            return false;
          }
       }
+      FAIL_WITH_MESSAGE("Not expected u==v");
       return false;
    });
+
    group_combinations(group_comb);
+   for(group_set::const_iterator it = group_comb.begin(); it != group_comb.end(); ++it) {
+      print(*it); std::cout << std::endl;
+   }
 
    schedule_type schedule;
    round_type round;
@@ -37,6 +44,11 @@ size_t Scheduler::solve() const {
       }
       ASSERT(group.size() == m_people);
       round.push_back(group);
+
+      // Remove from group_comb, it is no longer valid, ASSUMING ONLY ONE ONE PAIRING
+      group_set::iterator it = group_comb.find(group);
+      ASSERT(it != group_comb.end());
+      group_comb.erase(it);
    }
    ASSERT(round.size() == m_groups);
 
