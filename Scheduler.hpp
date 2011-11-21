@@ -16,10 +16,15 @@ private:
    typedef std::set<std::pair<int, int> > pair_set;
 
 public:
+   typedef std::vector< schedule_type > solution_set;
+
+public:
    Scheduler(size_t people, size_t groups);
 
    // Solve for a schedule with given constraints, returns number of solutions found
-   size_t solve() const;
+   size_t solve();
+
+   solution_set solutions() const { return m_solutions; }
 
 private:
    // Helper functions
@@ -31,7 +36,7 @@ private:
     * @param[in] group_set  set of groups still valid in schedule
     * @return               number of solutions with schedule
     */
-   size_t solve(schedule_type & schedule, group_set & group_set) const;
+   size_t solve(schedule_type & schedule, group_set & group_set);
 
    /**
     * Find the next group in round
@@ -42,7 +47,7 @@ private:
     * @param[in] cur        A pointer in group_set where to continue trying groups
     * @return               number of solutions with schedule plus round
     */
-   size_t solve(schedule_type & schedule, round_type & round, group_set & group_set, group_set::const_iterator cur) const;
+   size_t solve(schedule_type & schedule, round_type & round, group_set & group_set, group_set::const_iterator cur);
 
    bool valid_group(const group_type & group, const round_type & round) const;
    bool valid_group(const group_type & group, const schedule_type & schedule) const;
@@ -63,6 +68,7 @@ private:
    size_t m_people;
    size_t m_groups;
    size_t m_rounds;
+   solution_set m_solutions;
 };
 
 #endif

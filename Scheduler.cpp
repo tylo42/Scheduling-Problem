@@ -14,7 +14,9 @@ Scheduler::Scheduler(size_t people, size_t groups) : m_people(people), m_groups(
 #endif
 }
 
-size_t Scheduler::solve() const {
+size_t Scheduler::solve() {
+   m_solutions.clear();
+
    // A set of groups ordered by the group members
    group_set group_comb([](const group_type & u, const group_type & v) -> bool {
       ASSERT(u.size() == v.size());
@@ -53,12 +55,15 @@ size_t Scheduler::solve() const {
    return solve(schedule, group_comb);
 }
 
-size_t Scheduler::solve(schedule_type & schedule, group_set & group_comb) const {
+size_t Scheduler::solve(schedule_type & schedule, group_set & group_comb) {
    if(m_rounds == schedule.size()) {
       // we have a solution
+#ifdef DEBUG
       std::cout << "Solution: " << std::endl;
       print(schedule);
       std::cout << std::endl;
+#endif
+      m_solutions.push_back(schedule);
       return 1;
    }
 
@@ -66,7 +71,7 @@ size_t Scheduler::solve(schedule_type & schedule, group_set & group_comb) const 
    return solve(schedule, round, group_comb, group_comb.begin());
 }
 
-size_t Scheduler::solve(schedule_type & schedule, round_type & round, group_set & group_comb, group_set::const_iterator cur) const {
+size_t Scheduler::solve(schedule_type & schedule, round_type & round, group_set & group_comb, group_set::const_iterator cur) {
    size_t solutions = 0;
    for(; cur != group_comb.end(); ++cur) {
       if(!valid_group(*cur, round)) continue;
