@@ -7,22 +7,25 @@
 #include <vector>
 
 class Scheduler {
-private:
+public:
    typedef std::vector<int> group_type;
    typedef std::vector< group_type > round_type;
    typedef std::vector< round_type > schedule_type;
+   typedef std::vector< schedule_type > solution_set;
+
+   enum eCount { ONE, ALL };
+
+private:
    typedef std::function<bool(const group_type &, const group_type &)> group_less;
    typedef std::set< group_type, group_less > group_set;
    typedef std::set<std::pair<int, int> > pair_set;
 
-public:
-   typedef std::vector< schedule_type > solution_set;
 
 public:
    Scheduler(size_t people, size_t groups);
 
    // Solve for a schedule with given constraints, returns number of solutions found
-   size_t solve();
+   size_t solve(eCount count = ALL);
 
    solution_set solutions() const { return m_solutions; }
 
@@ -36,7 +39,7 @@ private:
     * @param[in] group_set  set of groups still valid in schedule
     * @return               number of solutions with schedule
     */
-   size_t solve(schedule_type & schedule, group_set & group_set);
+   size_t solve(eCount count, schedule_type & schedule, group_set & group_set);
 
    /**
     * Find the next group in round
@@ -47,7 +50,7 @@ private:
     * @param[in] cur        A pointer in group_set where to continue trying groups
     * @return               number of solutions with schedule plus round
     */
-   size_t solve(schedule_type & schedule, round_type & round, group_set & group_set, group_set::const_iterator cur);
+   size_t solve(eCount count, schedule_type & schedule, round_type & round, group_set & group_set, group_set::const_iterator cur);
 
    bool valid_group(const group_type & group, const round_type & round) const;
    bool valid_group(const group_type & group, const schedule_type & schedule) const;
@@ -60,15 +63,15 @@ private:
    void group_combinations(group_set & group_comb) const;
    void group_combinations(group_set & group_comb, group_type & group, size_t cur, size_t depth) const;
 
-   /// print the contents of the container
-   void print(const group_type & group) const;
-   void print(const round_type & round) const;
-   void print(const schedule_type & schedule) const;
-
    size_t m_people;
    size_t m_groups;
    size_t m_rounds;
    solution_set m_solutions;
 };
+
+/// print the contents of the container
+void print(const Scheduler::group_type & group);
+void print(const Scheduler::round_type & round);
+void print(const Scheduler::schedule_type & schedule);
 
 #endif

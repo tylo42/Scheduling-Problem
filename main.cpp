@@ -4,6 +4,11 @@
 #include <iostream>
 
 int main() {
-   Scheduler s(2, 2);
-   std::cout << s.solve() << std::endl;
+   Scheduler s(5, 5);
+   if(s.solve(Scheduler::ONE) > 0) {
+      Scheduler::solution_set solution = s.solutions();
+      print(solution[0]);
+   } else {
+      std::cout << "No Solution Found" << std::endl;
+   }
 }

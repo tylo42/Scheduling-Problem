@@ -12,6 +12,8 @@ BOOST_AUTO_TEST_CASE(solve) {
 
       Scheduler::solution_set solutions = s.solutions();
       BOOST_CHECK_EQUAL(2, solutions.size());
+
+      BOOST_CHECK_EQUAL(1, s.solve(Scheduler::ONE));
    }
 
    {
@@ -20,6 +22,8 @@ BOOST_AUTO_TEST_CASE(solve) {
 
       Scheduler::solution_set solutions = s.solutions();
       BOOST_CHECK_EQUAL(48, solutions.size());
+
+      BOOST_CHECK_EQUAL(1, s.solve(Scheduler::ONE));
    }
 
    {
@@ -28,5 +32,7 @@ BOOST_AUTO_TEST_CASE(solve) {
 
       Scheduler::solution_set solutions = s.solutions();
       BOOST_CHECK_EQUAL(72, solutions.size());
+
+      BOOST_CHECK_EQUAL(1, s.solve(Scheduler::ONE));
    }
 }
