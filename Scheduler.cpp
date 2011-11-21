@@ -27,7 +27,6 @@ size_t Scheduler::solve(eCount count) {
             return false;
          }
       }
-      FAIL_WITH_MESSAGE("Not expected u==v");
       return false;
    });
 
@@ -45,7 +44,7 @@ size_t Scheduler::solve(eCount count) {
       round.push_back(group);
 
       // Remove from group_comb, it is no longer valid, ASSUMING ONLY ONE ONE PAIRING
-      group_set::iterator it = group_comb.find(group);
+      group_set::const_iterator it = group_comb.find(group);
       ASSERT(it != group_comb.end());
       group_comb.erase(it);
    }
@@ -68,26 +67,38 @@ size_t Scheduler::solve(eCount count, schedule_type & schedule, group_set & grou
    }
 
    round_type round;
-   return solve(count, schedule, round, group_comb, group_comb.begin());
+   group_set group_comb_copy(group_comb);
+   group_set::const_iterator it = group_comb_copy.begin();
+   while(it != group_comb_copy.end()) {
+      group_set::const_iterator cur = it++;
+      if(!valid_group(*cur, schedule)) {
+         group_comb_copy.erase(cur);
+      }
+   }
+   return solve(count, schedule, round, group_comb_copy, group_comb_copy.begin());
 }
 
 size_t Scheduler::solve(eCount count, schedule_type & schedule, round_type & round, group_set & group_comb, group_set::const_iterator cur) {
    size_t solutions = 0;
+#ifdef UNKNOWN_OPTIMIZATION
+   if(std::distance(it, group_comb.end()) < static_cast<int>(m_groups)) {
+      return solutions;
+   }
+#endif
    for(; cur != group_comb.end(); ++cur) {
       if(!valid_group(*cur, round)) continue;
-      if(!valid_group(*cur, schedule)) continue;
       round.push_back(*cur);
       if(round.size() == m_groups) {
          schedule.push_back(round);
          solutions += solve(count, schedule, group_comb);
          schedule.pop_back();
       } else {
-         cur++;
+         ++cur;
          solutions += solve(count, schedule, round, group_comb, cur);
-         cur--;
+         --cur;
       }
-      round.pop_back();
       if(solutions > 0 && count == ONE) break;
+      round.pop_back();
    }
    return solutions;
 }
