@@ -3,10 +3,12 @@ $(CXX) = g++
 CXX += -std=c++0x -Wall -Werror
 
 all: CXX += -O2
-all: SchedulingProblem
+all: SchedulingProblem test
+	./unit_test/test
 
 debug: CXX += -DDEBUG -g
-debug: SchedulingProblem
+debug: SchedulingProblem test
+	./unit_test/test
 
 test: Scheduler.o test_Scheduler.o
 	$(CXX) unit_test/test_Scheduler.o Scheduler.o -o unit_test/test
