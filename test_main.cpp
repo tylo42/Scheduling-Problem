@@ -47,10 +47,30 @@ static void test_scheduler() {
 static void test_schedule() {
    {
       Schedule s(2, 2, 3);
-      s.push_round(Schedule::round_type({Schedule::group_type({ 1, 2 }),  Schedule::group_type({ 3, 4 })}));
-      s.push_round(Schedule::round_type({Schedule::group_type({ 1, 3 }),  Schedule::group_type({ 2, 4 })}));
-      s.push_round(Schedule::round_type({Schedule::group_type({ 1, 4 }),  Schedule::group_type({ 2, 3 })}));
+      BOOST_CHECK(0 == s.round_size());
 
+      s.push_round(Schedule::round_type({Schedule::group_type({ 1, 2 }),  Schedule::group_type({ 3, 4 })}));
+      BOOST_CHECK(1 == s.round_size());
+
+      BOOST_CHECK(s.valid_group(Schedule::group_type({1, 3})));
+      BOOST_CHECK(!s.valid_group(Schedule::group_type({1, 2})));
+
+      s.push_round(Schedule::round_type({Schedule::group_type({ 1, 3 }),  Schedule::group_type({ 2, 4 })}));
+      BOOST_CHECK(2 == s.round_size());
+
+      s.push_round(Schedule::round_type({Schedule::group_type({ 1, 4 }),  Schedule::group_type({ 2, 3 })}));
+      BOOST_CHECK(3 == s.round_size());
+
+      // Just print for now for visual check, add better checking later
       std::cout << s;
+
+      s.pop_round();
+      BOOST_CHECK(2 == s.round_size());
+
+      s.pop_round();
+      BOOST_CHECK(1 == s.round_size());
+
+      s.pop_round();
+      BOOST_CHECK(0 == s.round_size());
    }
 }

@@ -1,26 +1,49 @@
+#include "DesignByContract.hpp"
 #include "Schedule.hpp"
 
 #include <sstream>
 
 Schedule::Schedule(size_t people, size_t groups, size_t rounds)
 : m_people(people), m_groups(groups), m_rounds(rounds)
-{}
+{
+   ASSERT(this->consistent());
+}
 
 void Schedule::push_round(const round_type & round) {
+   ASSERT(this->consistent());
+
    m_schedule.push_back(round);
+
+   ASSERT(this->consistent());
 }
 
 void Schedule::pop_round() {
+   ASSERT(this->consistent());
+   ASSERT(!m_schedule.empty());
+   ASSERT(!m_schedule.size() != m_rounds);
+
    m_schedule.pop_back();
+
+   ASSERT(this->consistent());
 }
 
 size_t Schedule::round_size() const {
    return m_schedule.size();
 }
 
+bool Schedule::consistent() const {
+   if(m_schedule.size() > m_rounds) return false;
+   for(schedule_type::const_iterator s_it = m_schedule.begin(); s_it != m_schedule.end(); ++s_it) {
+      if(s_it->size() != m_groups) return false;
+      for(round_type::const_iterator r_it = s_it->begin(); r_it != s_it->end(); ++r_it) {
+         if(r_it->size() != m_people) return false;
+      }
+   }
+   return true;
+}
+
 bool Schedule::valid_group(const group_type & group) const {
    for(schedule_type::const_iterator s_it = m_schedule.begin(); s_it != m_schedule.end(); ++s_it) {
-      if(s_it->size() != m_groups) continue;
       for(round_type::const_iterator r_it = s_it->begin(); r_it != s_it->end(); ++r_it) {
          if(contain_same_pair(group, *r_it)) {
             return false;

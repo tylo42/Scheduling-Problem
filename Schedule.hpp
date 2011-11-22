@@ -31,6 +31,8 @@ private:
    std::string to_string(const round_type & round) const;
    std::string to_string(const schedule_type & schedule) const;
 
+   bool consistent() const;
+
    bool contain_same_pair(const group_type & group1, const group_type & group2) const;
 
    void pairs(const group_type & group, pair_set & pairs) const;

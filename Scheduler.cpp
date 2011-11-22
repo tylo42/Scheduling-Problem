@@ -57,11 +57,6 @@ size_t Scheduler::solve(eCount count) {
 size_t Scheduler::solve(eCount count, Schedule & schedule, const group_set & group_comb) {
    if(m_rounds == schedule.round_size()) {
       // we have a solution
-#ifdef DEBUG
-      std::cout << "Solution: " << std::endl;
-      std::cout << schedule;
-      std::cout << std::endl;
-#endif
       m_solutions.push_back(schedule);
       return 1;
    }
