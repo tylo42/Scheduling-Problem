@@ -61,20 +61,23 @@ size_t Scheduler::solve_next_round(eCount count, Schedule & schedule, const grou
       return 1;
    }
 
-   round_type round;
    group_set group_comb_copy(group_comb);
    remove_invalid_groups(schedule, group_comb_copy);
-   return solve_next_group(count, schedule, round, group_comb_copy, group_comb_copy.begin());
+   return solve_first_group_next_round(count, schedule, group_comb_copy);
 }
 
-void Scheduler::remove_invalid_groups(const Schedule & schedule, group_set & group_comb) const {
-   group_set::const_iterator it = group_comb.begin();
-   while(it != group_comb.end()) {
-      group_set::const_iterator cur = it++;
-      if(!schedule.valid_group(*cur)) {
-         group_comb.erase(cur);
-      }
+size_t Scheduler::solve_first_group_next_round(eCount count, Schedule & schedule, const group_set & group_comb) {
+   size_t solutions = 0;
+   round_type round;
+   for(group_set::const_iterator it = group_comb.begin(); it != group_comb.end(); ++it) {
+      if(it->at(0) != 0) break; // group_comb's groups are in lexicographic order, therefore all the groups containing 0 are at the begining
+      round.push_back(*it);
+      ++it;
+      solutions += solve_next_group(count, schedule, round, group_comb, it);
+      --it;
+      round.pop_back();
    }
+   return solutions;
 }
 
 size_t Scheduler::solve_next_group(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur) {
@@ -111,6 +114,16 @@ bool Scheduler::valid_group(const group_type & group, const round_type & round) 
       }
    }
    return true;
+}
+
+void Scheduler::remove_invalid_groups(const Schedule & schedule, group_set & group_comb) const {
+   group_set::const_iterator it = group_comb.begin();
+   while(it != group_comb.end()) {
+      group_set::const_iterator cur = it++;
+      if(!schedule.valid_group(*cur)) {
+         group_comb.erase(cur);
+      }
+   }
 }
 
 void Scheduler::group_combinations(group_set & group_comb) const {
