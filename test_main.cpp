@@ -12,36 +12,20 @@ int test_main(int, char *[]) {
    return 0;
 }
 
+static void test_one_scheduler(size_t people, size_t groups, size_t num_solutions) {
+   Scheduler s(people, groups);
+   BOOST_CHECK(num_solutions == s.solve());
+
+   Scheduler::solution_set solutions = s.solutions();
+   BOOST_CHECK(num_solutions == solutions.size());
+
+   BOOST_CHECK(1 == s.solve(Scheduler::ONE));
+}
+
 static void test_scheduler() {
-   {
-      Scheduler s(2, 2);
-      BOOST_CHECK(2 == s.solve());
-
-      Scheduler::solution_set solutions = s.solutions();
-      BOOST_CHECK(2 == solutions.size());
-
-      BOOST_CHECK(1 == s.solve(Scheduler::ONE));
-   }
-
-   {
-      Scheduler s(2, 3);
-      BOOST_CHECK(48 == s.solve());
-
-      Scheduler::solution_set solutions = s.solutions();
-      BOOST_CHECK(48 == solutions.size());
-
-      BOOST_CHECK(1 == s.solve(Scheduler::ONE));
-   }
-
-   {
-      Scheduler s(3, 3);
-      BOOST_CHECK(72 == s.solve());
-
-      Scheduler::solution_set solutions = s.solutions();
-      BOOST_CHECK(72 == solutions.size());
-
-      BOOST_CHECK(1 == s.solve(Scheduler::ONE));
-   }
+   test_one_scheduler(2, 2, 2);
+   test_one_scheduler(2, 3, 48);
+   test_one_scheduler(3, 3, 72);
 }
 
 static void test_schedule() {
