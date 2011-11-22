@@ -51,10 +51,10 @@ size_t Scheduler::solve(eCount count) {
    ASSERT(round.size() == m_groups);
 
    schedule.push_round(round);
-   return solve(count, schedule, group_comb);
+   return solve_next_round(count, schedule, group_comb);
 }
 
-size_t Scheduler::solve(eCount count, Schedule & schedule, const group_set & group_comb) {
+size_t Scheduler::solve_next_round(eCount count, Schedule & schedule, const group_set & group_comb) {
    if(m_rounds == schedule.round_size()) {
       // we have a solution
       m_solutions.push_back(schedule);
@@ -64,7 +64,7 @@ size_t Scheduler::solve(eCount count, Schedule & schedule, const group_set & gro
    round_type round;
    group_set group_comb_copy(group_comb);
    remove_invalid_groups(schedule, group_comb_copy);
-   return solve(count, schedule, round, group_comb_copy, group_comb_copy.begin());
+   return solve_next_group(count, schedule, round, group_comb_copy, group_comb_copy.begin());
 }
 
 void Scheduler::remove_invalid_groups(const Schedule & schedule, group_set & group_comb) const {
@@ -77,7 +77,7 @@ void Scheduler::remove_invalid_groups(const Schedule & schedule, group_set & gro
    }
 }
 
-size_t Scheduler::solve(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur) {
+size_t Scheduler::solve_next_group(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur) {
    size_t solutions = 0;
 #ifdef UNKNOWN_OPTIMIZATION
    if(std::distance(it, group_comb.end()) < static_cast<int>(m_groups)) {
@@ -89,11 +89,11 @@ size_t Scheduler::solve(eCount count, Schedule & schedule, round_type & round, c
       round.push_back(*cur);
       if(round.size() == m_groups) {
          schedule.push_round(round);
-         solutions += solve(count, schedule, group_comb);
+         solutions += solve_next_round(count, schedule, group_comb);
          schedule.pop_round();
       } else {
          ++cur;
-         solutions += solve(count, schedule, round, group_comb, cur);
+         solutions += solve_next_group(count, schedule, round, group_comb, cur);
          --cur;
       }
       if(solutions > 0 && count == ONE) break;
