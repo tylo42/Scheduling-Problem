@@ -38,7 +38,7 @@ private:
     * @param[in] group_set  set of groups still valid in schedule
     * @return               number of solutions with schedule
     */
-   size_t solve(eCount count, Schedule & schedule, const group_set & group_set);
+   size_t solve(eCount count, Schedule & schedule, const group_set & group_comb);
 
    /**
     * Find the next group in round
@@ -49,9 +49,11 @@ private:
     * @param[in] cur        A pointer in group_set where to continue trying groups
     * @return               number of solutions with schedule plus round
     */
-   size_t solve(eCount count, Schedule & schedule, round_type & round, const group_set & group_set, group_set::const_iterator cur);
+   size_t solve(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur);
 
    bool valid_group(const group_type & group, const round_type & round) const;
+
+   void remove_invalid_groups(const Schedule & schedule, group_set & group_comb) const;
 
    /// Calculate all the group combinations possible
    void group_combinations(group_set & group_comb) const;

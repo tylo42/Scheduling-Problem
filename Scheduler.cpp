@@ -63,14 +63,18 @@ size_t Scheduler::solve(eCount count, Schedule & schedule, const group_set & gro
 
    round_type round;
    group_set group_comb_copy(group_comb);
-   group_set::const_iterator it = group_comb_copy.begin();
-   while(it != group_comb_copy.end()) {
+   remove_invalid_groups(schedule, group_comb_copy);
+   return solve(count, schedule, round, group_comb_copy, group_comb_copy.begin());
+}
+
+void Scheduler::remove_invalid_groups(const Schedule & schedule, group_set & group_comb) const {
+   group_set::const_iterator it = group_comb.begin();
+   while(it != group_comb.end()) {
       group_set::const_iterator cur = it++;
       if(!schedule.valid_group(*cur)) {
-         group_comb_copy.erase(cur);
+         group_comb.erase(cur);
       }
    }
-   return solve(count, schedule, round, group_comb_copy, group_comb_copy.begin());
 }
 
 size_t Scheduler::solve(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur) {
