@@ -51,17 +51,17 @@ size_t Scheduler::solve(eCount count) {
    ASSERT(round.size() == m_groups);
 
    schedule.push_round(round);
-   return solve_next_round(count, schedule, group_comb);
+   return solve_next_round(count, schedule, group_comb, group_comb.begin());
 }
 
-size_t Scheduler::solve_next_round(eCount count, Schedule & schedule, const group_set & group_comb) {
+size_t Scheduler::solve_next_round(eCount count, Schedule & schedule, const group_set & group_comb, const group_set::const_iterator & first_group_it) {
    if(m_rounds == schedule.round_size()) {
       // we have a solution
       m_solutions.push_back(schedule);
       return 1;
    }
 
-   group_set group_comb_copy(group_comb);
+   group_set group_comb_copy(first_group_it, group_comb.end(), group_comb.value_comp());
    remove_invalid_groups(schedule, group_comb_copy);
    return solve_first_group_next_round(count, schedule, group_comb_copy);
 }
@@ -73,14 +73,14 @@ size_t Scheduler::solve_first_group_next_round(eCount count, Schedule & schedule
       if(it->at(0) != 0) break; // group_comb's groups are in lexicographic order, therefore all the groups containing 0 are at the begining
       round.push_back(*it);
       ++it;
-      solutions += solve_next_group(count, schedule, round, group_comb, it);
+      solutions += solve_next_group(count, schedule, round, group_comb, it, it);
       --it;
       round.pop_back();
    }
    return solutions;
 }
 
-size_t Scheduler::solve_next_group(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur) {
+size_t Scheduler::solve_next_group(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur, const group_set::const_iterator & first_group_it) {
    size_t solutions = 0;
 #ifdef UNKNOWN_OPTIMIZATION
    if(std::distance(it, group_comb.end()) < static_cast<int>(m_groups)) {
@@ -92,11 +92,11 @@ size_t Scheduler::solve_next_group(eCount count, Schedule & schedule, round_type
       round.push_back(*cur);
       if(round.size() == m_groups) {
          schedule.push_round(round);
-         solutions += solve_next_round(count, schedule, group_comb);
+         solutions += solve_next_round(count, schedule, group_comb, first_group_it);
          schedule.pop_round();
       } else {
          ++cur;
-         solutions += solve_next_group(count, schedule, round, group_comb, cur);
+         solutions += solve_next_group(count, schedule, round, group_comb, cur, first_group_it);
          --cur;
       }
       if(solutions > 0 && count == ONE) break;

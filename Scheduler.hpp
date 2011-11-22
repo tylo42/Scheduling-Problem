@@ -34,12 +34,13 @@ private:
    /**
     * Returns one if schedule is a solution, else start solving for the next round
     *
-    * @param[in] count       if ONE, stop after first solution
-    * @param[in] schedule    current schedule being solved for
-    * @param[in] group_comb  set of groups still valid in schedule
-    * @return                number of solutions with schedule
+    * @param[in] count           if ONE, stop after first solution
+    * @param[in] schedule        current schedule being solved for
+    * @param[in] group_comb      set of groups still valid in schedule
+    * @param[in] first_group_it  a pointer to where the next first group should start
+    * @return                    number of solutions with schedule
     */
-   size_t solve_next_round(eCount count, Schedule & schedule, const group_set & group_comb);
+   size_t solve_next_round(eCount count, Schedule & schedule, const group_set & group_comb, const group_set::const_iterator & first_group_it);
 
    /**
     * Try the first group of the next round
@@ -54,14 +55,15 @@ private:
    /**
     * Find the next group in round
     *
-    * @param[in] count       if ONE, stop after first solution
-    * @param[in] schedule    current schedule being solved for
-    * @param[in] round       current round being solved for
-    * @param[in] group_comb  set of groups still valid in schedule
-    * @param[in] cur         A pointer in group_set where to continue trying groups
-    * @return                number of solutions with schedule plus round
+    * @param[in] count           if ONE, stop after first solution
+    * @param[in] schedule        current schedule being solved for
+    * @param[in] round           current round being solved for
+    * @param[in] group_comb      set of groups still valid in schedule
+    * @param[in] cur             a pointer in group_set where to continue trying groups
+    * @param[in] first_group_it  a pointer to where the next first group should start
+    * @return                    number of solutions with schedule plus round
     */
-   size_t solve_next_group(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur);
+   size_t solve_next_group(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur, const group_set::const_iterator & first_group_it);
 
    bool valid_group(const group_type & group, const round_type & round) const;
 
