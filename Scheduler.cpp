@@ -5,12 +5,30 @@
 #include <vector>
 #include <algorithm>
 
-Scheduler::Scheduler(size_t people, size_t groups) : m_people(people), m_groups(groups) {
+Scheduler::Scheduler(size_t people, size_t groups)
+   : m_people(people), m_groups(groups), m_min(1), m_max(1)
+{
    // for now assume only everyone with everyone else exactly once
    m_rounds = ((m_people * m_groups) - 1) / (m_people - 1);
    ASSERT((m_rounds * (m_people - 1) + 1) == (m_people * m_groups)); // Fix for cases like this to find best solution
 #ifdef DEBUG
    std::cout << "Required Rounds: " << m_rounds << std::endl;
+#endif
+}
+
+Scheduler::Scheduler(size_t people, size_t groups, size_t rounds)
+   : m_people(people), m_groups(groups), m_rounds(rounds), m_min(1), m_max(1)
+{
+   ASSERT(m_rounds <= ((m_people * m_groups) - 1) / (m_people - 1));
+}
+
+Scheduler::Scheduler(size_t people, size_t groups, size_t rounds, size_t min, size_t max)
+   : m_people(people), m_groups(groups), m_rounds(rounds), m_min(min), m_max(max)
+{
+#ifdef DEBUG
+   size_t req_rounds = (((m_people * m_groups) - 1) / (m_people - 1));
+   ASSERT(req_rounds * m_min <= m_rounds);
+   ASSERT(m_rounds <= req_rounds * m_max);
 #endif
 }
 
@@ -55,7 +73,7 @@ size_t Scheduler::solve(eCount count) {
 }
 
 size_t Scheduler::solve_next_round(eCount count, Schedule & schedule, const group_set & group_comb, const group_set::const_iterator & first_group_it) {
-   if(m_rounds == schedule.round_size()) {
+   if(m_rounds == schedule.round_size() && schedule.check(m_min, m_max)) {
       // we have a solution
       m_solutions.push_back(schedule);
       return 1;
@@ -69,12 +87,12 @@ size_t Scheduler::solve_next_round(eCount count, Schedule & schedule, const grou
 size_t Scheduler::solve_first_group_next_round(eCount count, Schedule & schedule, const group_set & group_comb) {
    size_t solutions = 0;
    round_type round;
-   for(group_set::const_iterator it = group_comb.begin(); it != group_comb.end(); ++it) {
-      if(it->at(0) != 0) break; // group_comb's groups are in lexicographic order, therefore all the groups containing 0 are at the begining
+   group_set::const_iterator it = group_comb.begin();
+   // group_comb's groups are in lexicographic order, therefore all the groups containing 0 are at the begining
+   while(it != group_comb.end() && it->at(0) == 0) { 
       round.push_back(*it);
       ++it;
       solutions += solve_next_group(count, schedule, round, group_comb, it, it);
-      --it;
       round.pop_back();
    }
    return solutions;

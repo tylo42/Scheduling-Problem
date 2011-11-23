@@ -21,7 +21,8 @@ public:
    void push_round(const round_type & round);
    void pop_round();
    size_t round_size() const;
-   bool valid_group(const group_type & group) const;
+   bool valid_group(const group_type & group, size_t size = 1) const;
+   bool check(size_t min, size_t max) const;
 
    friend std::ostream & operator<<(std::ostream & os, const Schedule & s);
 

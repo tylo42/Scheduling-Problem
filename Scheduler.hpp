@@ -22,6 +22,8 @@ private:
 
 public:
    Scheduler(size_t people, size_t groups);
+   Scheduler(size_t people, size_t groups, size_t rounds);
+   Scheduler(size_t people, size_t groups, size_t rounds, size_t min, size_t max);
 
    // Solve for a schedule with given constraints, returns number of solutions found
    size_t solve(eCount count = ALL);
@@ -76,6 +78,8 @@ private:
    size_t m_people;
    size_t m_groups;
    size_t m_rounds;
+   size_t m_min;
+   size_t m_max;
    solution_set m_solutions;
 };
 
