@@ -99,14 +99,20 @@ bool Schedule::check(size_t min, size_t max) const {
 }
 
 bool Schedule::contain_same_pair(const group_type & group1, const group_type & group2) const {
-   pair_set group1_pairs;
-   pairs(group1, group1_pairs);
-   pair_set group2_pairs;
-   pairs(group2, group2_pairs);
+   auto it1 = group1.begin();
+   auto it2 = group2.begin();
 
-   for(pair_set::const_iterator it = group1_pairs.begin(); it != group1_pairs.end(); ++it) {
-      if(group2_pairs.find(*it) != group2_pairs.end()) {
-         return true;
+   size_t count = 0;
+   while(it1 != group1.end() && it2 != group2.end()) {
+      if(*it1 < *it2) {
+         ++it1;
+      } else if(*it1 > *it2) {
+         ++it2;
+      } else {
+         count++;
+         if(count == 2) return true;
+         ++it1;
+         ++it2;
       }
    }
    return false;
