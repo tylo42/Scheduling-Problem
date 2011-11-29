@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <set>
 #include <vector>
 
@@ -17,8 +18,9 @@ public:
    enum eCount { ONE, ALL };
 
 private:
-   typedef std::function<bool(const group_type &, const group_type &)> group_less;
-   typedef std::set< group_type, group_less > group_set;
+   typedef std::shared_ptr<const group_type> group_ptr;
+   typedef std::function<bool(const group_ptr &, const group_ptr &)> group_less;
+   typedef std::set< group_ptr, group_less > group_set;
 
 public:
    Scheduler(size_t people, size_t groups);

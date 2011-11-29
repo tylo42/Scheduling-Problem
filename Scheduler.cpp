@@ -36,12 +36,12 @@ size_t Scheduler::solve(eCount count) {
    m_solutions.clear();
 
    // A set of groups ordered by the group members
-   group_set group_comb([](const group_type & u, const group_type & v) -> bool {
-      ASSERT(u.size() == v.size());
-      for(size_t i=0; i<u.size(); i++) {
-         if(u[i] < v[i]) {
+   group_set group_comb([](const group_ptr & u, const group_ptr & v) -> bool {
+      ASSERT(u->size() == v->size());
+      for(size_t i=0; i<u->size(); i++) {
+         if((*u)[i] < (*v)[i]) {
             return true;
-         } else if(u[i] > v[i]) {
+         } else if((*u)[i] > (*v)[i]) {
             return false;
          }
       }
@@ -62,7 +62,7 @@ size_t Scheduler::solve(eCount count) {
       round.push_back(group);
 
       // Remove from group_comb, it is no longer valid, ASSUMING ONLY ONE ONE PAIRING
-      group_set::const_iterator it = group_comb.find(group);
+      group_set::const_iterator it = group_comb.find(std::make_shared<group_type>(group));
       ASSERT(it != group_comb.end());
       group_comb.erase(it);
    }
@@ -89,8 +89,8 @@ size_t Scheduler::solve_first_group_next_round(eCount count, Schedule & schedule
    round_type round;
    group_set::const_iterator it = group_comb.begin();
    // group_comb's groups are in lexicographic order, therefore all the groups containing 0 are at the begining
-   while(it != group_comb.end() && it->at(0) == 0) { 
-      round.push_back(*it);
+   while(it != group_comb.end() && (*(*it))[0] == 0) {
+      round.push_back(*(*it));
       ++it;
       solutions += solve_next_group(count, schedule, round, group_comb, it, it);
       round.pop_back();
@@ -106,8 +106,8 @@ size_t Scheduler::solve_next_group(eCount count, Schedule & schedule, round_type
    }
 #endif
    for(; cur != group_comb.end(); ++cur) {
-      if(!valid_group(*cur, round)) continue;
-      round.push_back(*cur);
+      if(!valid_group(*(*cur), round)) continue;
+      round.push_back(*(*cur));
       if(round.size() == m_groups) {
          schedule.push_round(round);
          solutions += solve_next_round(count, schedule, group_comb, first_group_it);
@@ -138,7 +138,7 @@ void Scheduler::remove_invalid_groups(const Schedule & schedule, group_set & gro
    group_set::const_iterator it = group_comb.begin();
    while(it != group_comb.end()) {
       group_set::const_iterator cur = it++;
-      if(!schedule.valid_group(*cur)) {
+      if(!schedule.valid_group(*(*cur))) {
          group_comb.erase(cur);
       }
    }
@@ -154,7 +154,7 @@ void Scheduler::group_combinations(group_set & group_comb, group_type & group, s
    for(size_t i=cur; i<max; i++) {
       group.at(depth-1) = i;
       if(depth == m_people) {
-         group_comb.insert(group);
+         group_comb.insert(std::make_shared<group_type>(group));
       } else {
          group_combinations(group_comb, group, i+1, depth+1);
       }

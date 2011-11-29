@@ -2,7 +2,7 @@ $(CXX) = g++
 
 CXX += -std=c++0x -Wall -Werror
 
-all: CXX += -O2
+all: CXX += -O3
 all: SchedulingProblem test
 	./test
 
