@@ -54,15 +54,15 @@ size_t Scheduler::solve(eCount count) {
    round_type round;
    int cur = 0;
    for(size_t i=0; i<m_groups; i++) {
-      group_type group;
+      auto group = std::make_shared<group_type>();
       for(size_t j=0; j<m_people; j++) {
-         group.push_back(cur++);
+         group->push_back(cur++);
       }
-      ASSERT(group.size() == m_people);
+      ASSERT(group->size() == m_people);
       round.push_back(group);
 
       // Remove from group_comb, it is no longer valid, ASSUMING ONLY ONE ONE PAIRING
-      group_set::const_iterator it = group_comb.find(std::make_shared<group_type>(group));
+      group_set::const_iterator it = group_comb.find(group);
       ASSERT(it != group_comb.end());
       group_comb.erase(it);
    }
@@ -90,7 +90,7 @@ size_t Scheduler::solve_first_group_next_round(eCount count, Schedule & schedule
    group_set::const_iterator it = group_comb.begin();
    // group_comb's groups are in lexicographic order, therefore all the groups containing 0 are at the begining
    while(it != group_comb.end() && (*(*it))[0] == 0) {
-      round.push_back(*(*it));
+      round.push_back(*it);
       ++it;
       solutions += solve_next_group(count, schedule, round, group_comb, it, it);
       round.pop_back();
@@ -107,7 +107,7 @@ size_t Scheduler::solve_next_group(eCount count, Schedule & schedule, round_type
 #endif
    for(; cur != group_comb.end(); ++cur) {
       if(!valid_group(*(*cur), round)) continue;
-      round.push_back(*(*cur));
+      round.push_back(*cur);
       if(round.size() == m_groups) {
          schedule.push_round(round);
          solutions += solve_next_round(count, schedule, group_comb, first_group_it);
@@ -126,7 +126,7 @@ size_t Scheduler::solve_next_group(eCount count, Schedule & schedule, round_type
 bool Scheduler::valid_group(const group_type & group, const round_type & round) const {
    for(round_type::const_iterator r_it = round.begin(); r_it != round.end(); ++r_it) {
       for(group_type::const_iterator g_it = group.begin(); g_it != group.end(); ++g_it) {
-         if(std::find(r_it->begin(), r_it->end(), *g_it) != r_it->end()) {
+         if(std::find((*r_it)->begin(), (*r_it)->end(), *g_it) != (*r_it)->end()) {
             return false;
          }
       }

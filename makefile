@@ -13,7 +13,7 @@ debug: SchedulingProblem test
 SchedulingProblem: main.o Scheduler.o Schedule.o
 	$(CXX) main.o Scheduler.o Schedule.o -o SchedulingProblem
 
-main.o: main.cpp Scheduler.hpp DesignByContract.hpp
+main.o: main.cpp Scheduler.hpp Schedule.hpp DesignByContract.hpp
 	$(CXX) -c main.cpp
 
 Scheduler.o: Scheduler.cpp Scheduler.hpp Schedule.hpp DesignByContract.hpp

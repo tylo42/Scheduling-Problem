@@ -37,7 +37,7 @@ bool Schedule::consistent() const {
    for(schedule_type::const_iterator s_it = m_schedule.begin(); s_it != m_schedule.end(); ++s_it) {
       if(s_it->size() != m_groups) return false;
       for(round_type::const_iterator r_it = s_it->begin(); r_it != s_it->end(); ++r_it) {
-         if(r_it->size() != m_people) return false;
+         if((*r_it)->size() != m_people) return false;
       }
    }
    return true;
@@ -47,7 +47,7 @@ bool Schedule::valid_group(const group_type & group, size_t size) const {
    size_t count = 0;
    for(schedule_type::const_iterator s_it = m_schedule.begin(); s_it != m_schedule.end(); ++s_it) {
       for(round_type::const_iterator r_it = s_it->begin(); r_it != s_it->end(); ++r_it) {
-         if(contain_same_pair(group, *r_it)) {
+         if(contain_same_pair(group, *(*r_it))) {
             count++;
             if(count == size) {
                return false; // FIX ME DOES NOT WORK FOR size > 1
@@ -81,7 +81,7 @@ bool Schedule::check(size_t min, size_t max) const {
    for(schedule_type::const_iterator s_it = m_schedule.begin(); s_it != m_schedule.end(); ++s_it) {
       for(round_type::const_iterator r_it = s_it->begin(); r_it != s_it->end(); ++r_it) {
          pair_set group_pairs;
-         pairs(*r_it, group_pairs);
+         pairs(*(*r_it), group_pairs);
          for(pair_set::const_iterator it = group_pairs.begin(); it != group_pairs.end(); ++it) {
             if(max < ++pair_map[*it]) {
                return false;
@@ -135,10 +135,10 @@ std::string Schedule::to_string(const group_type & group) const {
 std::string Schedule::to_string(const round_type & round) const {
    round_type::const_iterator it = round.begin();
    std::ostringstream oss;
-   oss << to_string(*it);
+   oss << to_string(*(*it));
    ++it;
    for(; it != round.end(); ++it) {
-      oss << " " << to_string(*it);
+      oss << " " << to_string(*(*it));
    }
    oss << std::endl;
    return oss.str();

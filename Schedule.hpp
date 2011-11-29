@@ -2,6 +2,7 @@
 #define SCHEDULE_HPP
 
 #include <iostream>
+#include <memory>
 #include <set>
 #include <string>
 #include <vector>
@@ -9,10 +10,11 @@
 class Schedule {
 public:
    typedef std::vector<int> group_type;
-   typedef std::vector< group_type > round_type;
+   typedef std::shared_ptr<group_type> group_ptr;
+   typedef std::vector<group_ptr> round_type;
 
 private:
-   typedef std::vector< round_type > schedule_type;
+   typedef std::vector<round_type> schedule_type;
    typedef std::set<std::pair<int, int> > pair_set;
 
 public:

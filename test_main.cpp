@@ -38,21 +38,25 @@ static void test_scheduler() {
    test_one_scheduler(5, 5);
 }
 
+static Schedule::round_type make_round(const Schedule::group_type & g1, const Schedule::group_type & g2) {
+   return Schedule::round_type({std::make_shared<Schedule::group_type>(g1), std::make_shared<Schedule::group_type>(g2)});
+}
+
 static void test_schedule() {
    {
       Schedule s(2, 2, 3);
       BOOST_CHECK(0 == s.round_size());
 
-      s.push_round(Schedule::round_type({Schedule::group_type({ 0, 1 }),  Schedule::group_type({ 2, 3 })}));
+      s.push_round(make_round(Schedule::group_type({ 0, 1 }), Schedule::group_type({ 2, 3 })));
       BOOST_CHECK(1 == s.round_size());
 
       BOOST_CHECK(s.valid_group(Schedule::group_type({0, 2})));
       BOOST_CHECK(!s.valid_group(Schedule::group_type({0, 1})));
 
-      s.push_round(Schedule::round_type({Schedule::group_type({ 0, 2 }),  Schedule::group_type({ 1, 3 })}));
+      s.push_round(make_round(Schedule::group_type({ 0, 2 }), Schedule::group_type({ 1, 3 })));
       BOOST_CHECK(2 == s.round_size());
 
-      s.push_round(Schedule::round_type({Schedule::group_type({ 0, 3 }),  Schedule::group_type({ 1, 2 })}));
+      s.push_round(make_round(Schedule::group_type({ 0, 3 }), Schedule::group_type({ 1, 2 })));
       BOOST_CHECK(3 == s.round_size());
 
       // Just print for now for visual check, add better checking later

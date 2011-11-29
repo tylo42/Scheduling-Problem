@@ -13,12 +13,12 @@ class Scheduler {
 public:
    typedef std::vector< Schedule > solution_set;
    typedef Schedule::group_type group_type;
+   typedef Schedule::group_ptr  group_ptr;
    typedef Schedule::round_type round_type;
 
    enum eCount { ONE, ALL };
 
 private:
-   typedef std::shared_ptr<const group_type> group_ptr;
    typedef std::function<bool(const group_ptr &, const group_ptr &)> group_less;
    typedef std::set< group_ptr, group_less > group_set;
 
