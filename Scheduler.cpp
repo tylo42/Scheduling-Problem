@@ -62,9 +62,9 @@ size_t Scheduler::solve(eCount count) {
       round.push_back(group);
 
       // Remove from group_comb, it is no longer valid, ASSUMING ONLY ONE ONE PAIRING
-      group_set::const_iterator it = group_comb.find(group);
-      ASSERT(it != group_comb.end());
-      group_comb.erase(it);
+      //group_set::const_iterator it = group_comb.find(group);
+      //ASSERT(it != group_comb.end());
+      //group_comb.erase(it);
    }
    ASSERT(round.size() == m_groups);
 
@@ -138,7 +138,7 @@ void Scheduler::remove_invalid_groups(const Schedule & schedule, group_set & gro
    group_set::const_iterator it = group_comb.begin();
    while(it != group_comb.end()) {
       group_set::const_iterator cur = it++;
-      if(!schedule.valid_group(*(*cur))) {
+      if(!schedule.valid_group(*(*cur), m_max)) {
          group_comb.erase(cur);
       }
    }

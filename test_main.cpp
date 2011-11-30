@@ -50,8 +50,9 @@ static void test_schedule() {
       s.push_round(make_round(Schedule::group_type({ 0, 1 }), Schedule::group_type({ 2, 3 })));
       BOOST_CHECK(1 == s.round_size());
 
-      BOOST_CHECK(s.valid_group(Schedule::group_type({0, 2})));
-      BOOST_CHECK(!s.valid_group(Schedule::group_type({0, 1})));
+      BOOST_CHECK( s.valid_group(Schedule::group_type({0, 2}), 1));
+      BOOST_CHECK(!s.valid_group(Schedule::group_type({0, 1}), 1));
+      BOOST_CHECK( s.valid_group(Schedule::group_type({0, 1}), 2));
 
       s.push_round(make_round(Schedule::group_type({ 0, 2 }), Schedule::group_type({ 1, 3 })));
       BOOST_CHECK(2 == s.round_size());

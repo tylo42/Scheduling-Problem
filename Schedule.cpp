@@ -1,8 +1,22 @@
 #include "DesignByContract.hpp"
 #include "Schedule.hpp"
 
+#include <algorithm>
 #include <map>
 #include <sstream>
+
+static bool pair_comp(const std::pair<int, int> & pair1, const std::pair<int, int> & pair2) {
+   if(pair1.first < pair2.first) {
+      return true;
+   } else if(pair1.first > pair2.first) {
+      return false;
+   } else {
+      if(pair1.second < pair2.second) {
+         return true;
+      }
+   }
+   return false;
+}
 
 Schedule::Schedule(size_t people, size_t groups, size_t rounds)
 : m_people(people), m_groups(groups), m_rounds(rounds)
@@ -44,13 +58,19 @@ bool Schedule::consistent() const {
 }
 
 bool Schedule::valid_group(const group_type & group, size_t size) const {
-   size_t count = 0;
+   pair_usage_map pair_map(pair_comp);
    for(schedule_type::const_iterator s_it = m_schedule.begin(); s_it != m_schedule.end(); ++s_it) {
       for(round_type::const_iterator r_it = s_it->begin(); r_it != s_it->end(); ++r_it) {
          if(contain_same_pair(group, *(*r_it))) {
-            count++;
-            if(count == size) {
-               return false; // FIX ME DOES NOT WORK FOR size > 1
+            if(size == 1) {
+               return false;
+            }
+            pair_set group_pairs(pair_comp);
+            matching_pairs(group, *(*r_it), group_pairs);
+            for(pair_set::const_iterator it = group_pairs.begin(); it != group_pairs.end(); ++it) {
+               if(size < ++pair_map[*it]) {
+                  return false;
+               }
             }
          }
       }
@@ -75,12 +95,11 @@ static size_t comb(size_t n, size_t r) {
 }
 
 bool Schedule::check(size_t min, size_t max) const {
-   if(min<1) return true;
-
-   std::map<std::pair<int, int>, size_t> pair_map;
+   // check max
+   pair_usage_map pair_map(pair_comp);
    for(schedule_type::const_iterator s_it = m_schedule.begin(); s_it != m_schedule.end(); ++s_it) {
       for(round_type::const_iterator r_it = s_it->begin(); r_it != s_it->end(); ++r_it) {
-         pair_set group_pairs;
+         pair_set group_pairs(pair_comp);
          pairs(*(*r_it), group_pairs);
          for(pair_set::const_iterator it = group_pairs.begin(); it != group_pairs.end(); ++it) {
             if(max < ++pair_map[*it]) {
@@ -89,6 +108,9 @@ bool Schedule::check(size_t min, size_t max) const {
          }
       }
    }
+
+   // if max passes and minimum is less than 1 this works
+   if(min<1) return true;
 
    if(pair_map.size() < comb(m_groups*m_people, 2)) return false;
    if(min == 1) return true;
@@ -116,6 +138,20 @@ bool Schedule::contain_same_pair(const group_type & group1, const group_type & g
       }
    }
    return false;
+}
+
+void Schedule::matching_pairs(const group_type & group1, const group_type & group2, pair_set & result) const {
+   pair_set pairs1(pair_comp);
+   pair_set pairs2(pair_comp);
+   pairs(group1, pairs1);
+   pairs(group2, pairs2);
+   ASSERT(pairs1.size() == pairs2.size());
+
+   std::vector<pair_type> v(pairs1.size());
+   auto it = std::set_union(pairs1.begin(), pairs1.end(),
+                  pairs2.begin(), pairs2.end(),
+                  v.begin(), pair_comp);
+   result.insert(v.begin(), it);
 }
 
 void Schedule::pairs(const group_type & group, pair_set & pairs) const {

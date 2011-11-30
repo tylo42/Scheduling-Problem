@@ -6,7 +6,7 @@
 #include <time.h>
 
 int main() {
-   Scheduler s(3,5);
+   Scheduler s(2,3,4,0,3);
    clock_t start = clock();
    if(s.solve(Scheduler::ONE) > 0) {
       Scheduler::solution_set solution = s.solutions();
