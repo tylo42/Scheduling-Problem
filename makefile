@@ -29,4 +29,4 @@ test_main.o: test_main.cpp Scheduler.hpp Schedule.hpp
 	$(CXX) -c test_main.cpp -o test_main.o
 
 clean:
-	rm -rf *.o SchedulingProblem test
+	rm -rf *.o SchedulingProblem test test_actual.txt

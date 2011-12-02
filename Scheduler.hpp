@@ -30,7 +30,7 @@ public:
    // Solve for a schedule with given constraints, returns number of solutions found
    size_t solve(eCount count = ALL);
 
-   solution_set solutions() const { return m_solutions; }
+   solution_set const & solutions() const { return m_solutions; }
 
 private:
    // Helper functions
