@@ -114,7 +114,7 @@ bool Schedule::check(size_t min, size_t max) const {
 
    if(pair_map.size() < comb(m_groups*m_people, 2)) return false;
    if(min == 1) return true;
-   for(std::map<std::pair<int, int>, size_t>::const_iterator it = pair_map.begin(); it != pair_map.end(); ++it) {
+   for(auto it = pair_map.begin(); it != pair_map.end(); ++it) {
       if(it->second < min) return false;
    }
    return true;

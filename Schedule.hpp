@@ -11,13 +11,13 @@
 
 class Schedule {
 public:
-   typedef std::vector<int> group_type;
+   typedef std::vector<short> group_type;
    typedef std::shared_ptr<group_type> group_ptr;
    typedef std::vector<group_ptr> round_type;
 
 private:
    typedef std::vector<round_type> schedule_type;
-   typedef std::pair<int, int> pair_type;
+   typedef std::pair<short, short> pair_type;
    typedef std::function<bool(const pair_type &, const pair_type &)> pair_less;
    typedef std::set<pair_type, pair_less> pair_set;
    typedef std::map<pair_type, size_t, pair_less> pair_usage_map;
