@@ -28,7 +28,7 @@ public:
    Scheduler(size_t people, size_t groups, size_t rounds, size_t min, size_t max);
 
    // Solve for a schedule with given constraints, returns number of solutions found
-   size_t solve(eCount count = ALL);
+   size_t solve(eCount count = ALL) const;
 
    solution_set const & solutions() const { return m_solutions; }
 
@@ -44,7 +44,7 @@ private:
     * @param[in] first_group_it  a pointer to where the next first group should start
     * @return                    number of solutions with schedule
     */
-   size_t solve_next_round(eCount count, Schedule & schedule, const group_set & group_comb, const group_set::const_iterator & first_group_it);
+   size_t solve_next_round(eCount count, Schedule & schedule, const group_set & group_comb, const group_set::const_iterator & first_group_it) const;
 
    /**
     * Try the first group of the next round
@@ -54,7 +54,7 @@ private:
     * @param[in] group_comb  set of groups still valid in schedule
     * @return                number of solutions with schedule
     */
-   size_t solve_first_group_next_round(eCount count, Schedule & schedule, const group_set & group_comb);
+   size_t solve_first_group_next_round(eCount count, Schedule & schedule, const group_set & group_comb) const;
 
    /**
     * Find the next group in round
@@ -67,7 +67,7 @@ private:
     * @param[in] first_group_it  a pointer to where the next first group should start
     * @return                    number of solutions with schedule plus round
     */
-   size_t solve_next_group(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur, const group_set::const_iterator & first_group_it);
+   size_t solve_next_group(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur, const group_set::const_iterator & first_group_it) const;
 
    bool valid_group(const group_type & group, const round_type & round) const;
 
@@ -82,7 +82,7 @@ private:
    size_t m_rounds;
    size_t m_min;
    size_t m_max;
-   solution_set m_solutions;
+   mutable solution_set m_solutions;
 };
 
 #endif // SCHEDULER_HPP

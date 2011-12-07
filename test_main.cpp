@@ -10,35 +10,8 @@
 
 static void test_scheduler(std::ostream & os);
 static void test_schedule(std::ostream & os);
+static bool files_match(const std::string & expected, const std::string & actual);
 
-static bool files_match(const std::string & expected, const std::string & actual) {
-   std::ifstream expected_file(expected.c_str());
-   std::ifstream actual_file(actual.c_str());
-   BOOST_CHECK(expected_file.is_open());
-   BOOST_CHECK(actual_file.is_open());
-
-   bool match = true;
-   while(!expected_file.eof() && !actual_file.eof()) {
-      std::string expected_line;
-      std::string actual_line;
-      expected_file >> expected_line;
-      actual_file >> actual_line;
-
-      if(expected_line != actual_line) {
-         match = false;
-         break;
-      }
-   }
-
-   if(!expected_file.eof() || !actual_file.eof()) {
-      match = false;
-   }
-
-   actual_file.close();
-   expected_file.close();
-
-   return match;
-}
 
 int test_main(int, char *[]) {
    clock_t start = clock();
@@ -62,8 +35,7 @@ static void print_schedules(const Scheduler::solution_set & schedules, std::ostr
    }
 }
 
-static void test_all_scheduler(size_t people, size_t groups, size_t num_solutions, std::ostream & os) {
-   Scheduler s(people, groups);
+static void test_all_scheduler(const Scheduler & s, size_t num_solutions, std::ostream & os) {
    BOOST_CHECK(num_solutions == s.solve());
    BOOST_CHECK(num_solutions == s.solutions().size());
 
@@ -80,8 +52,7 @@ static void test_all_scheduler(size_t people, size_t groups, size_t num_solution
    print_schedules(s.solutions(), os);
 }
 
-static void test_one_scheduler(size_t people, size_t groups, std::ostream & os) {
-   Scheduler s(people, groups);
+static void test_one_scheduler(const Scheduler & s, std::ostream & os) {
    BOOST_CHECK(1 == s.solve(Scheduler::ONE));
    BOOST_CHECK(1 == s.solutions().size());
 
@@ -89,44 +60,47 @@ static void test_one_scheduler(size_t people, size_t groups, std::ostream & os) 
 }
 
 static void test_scheduler(std::ostream & os) {
-   test_all_scheduler(0,  0,  0, os);
-   test_all_scheduler(1,  0,  0, os);
-   test_all_scheduler(0,  1,  0, os);
+   test_all_scheduler(Scheduler(0,  0),  0, os);
+   test_all_scheduler(Scheduler(1,  0),  0, os);
+   test_all_scheduler(Scheduler(0,  1),  0, os);
 
-   test_all_scheduler(1,  1,  1, os);
-   test_all_scheduler(1,  2,  0, os);
-   test_all_scheduler(1,  3,  0, os);
-   test_all_scheduler(1,  4,  0, os);
-   test_all_scheduler(1,  5,  0, os);
+   test_all_scheduler(Scheduler(1,  1),  1, os);
+   test_all_scheduler(Scheduler(1,  2),  0, os);
+   test_all_scheduler(Scheduler(1,  3),  0, os);
+   test_all_scheduler(Scheduler(1,  4),  0, os);
+   test_all_scheduler(Scheduler(1,  5),  0, os);
 
-   test_all_scheduler(2,  1,  1, os);
-   test_all_scheduler(2,  2,  1, os);
-   test_all_scheduler(2,  3,  2, os);
-   test_one_scheduler(2,  4, os);
-   test_one_scheduler(2,  5, os);
-   test_one_scheduler(2,  6, os);
-   test_one_scheduler(2,  7, os);
-   test_one_scheduler(2,  8, os);
-   test_one_scheduler(2,  9, os);
-   test_one_scheduler(2, 10, os);
+   test_all_scheduler(Scheduler(2,  1),  1, os);
+   test_all_scheduler(Scheduler(2,  2),  1, os);
+   test_all_scheduler(Scheduler(2,  3),  2, os);
+   test_one_scheduler(Scheduler(2,  4), os);
+   test_one_scheduler(Scheduler(2,  5), os);
+   test_one_scheduler(Scheduler(2,  6), os);
+   test_one_scheduler(Scheduler(2,  7), os);
+   test_one_scheduler(Scheduler(2,  8), os);
+   test_one_scheduler(Scheduler(2,  9), os);
+   test_one_scheduler(Scheduler(2, 10), os);
 
-   test_all_scheduler(3,  1,  1, os);
-   test_all_scheduler(3,  2,  0, os);
-   test_all_scheduler(3,  3, 12, os);
-   test_all_scheduler(3,  4,  0, os);
+   test_all_scheduler(Scheduler(3,  1),  1, os);
+   test_all_scheduler(Scheduler(3,  2),  0, os);
+   test_all_scheduler(Scheduler(3,  3), 12, os);
+   test_all_scheduler(Scheduler(3,  4),  0, os);
    //test_one_scheduler(3,  5, os); // for now this one takes too long to run after each compile
 
-   test_all_scheduler(4,  1,  1, os);
-   test_all_scheduler(4,  2,  0, os);
-   test_all_scheduler(4,  3,  0, os);
-   test_one_scheduler(4,  4, os);
-   test_all_scheduler(4,  5,  0, os);
+   test_all_scheduler(Scheduler(4,  1),  1, os);
+   test_all_scheduler(Scheduler(4,  2),  0, os);
+   test_all_scheduler(Scheduler(4,  3),  0, os);
+   test_one_scheduler(Scheduler(4,  4), os);
+   test_all_scheduler(Scheduler(4,  5),  0, os);
 
-   test_all_scheduler(5,  1,  1, os);
-   test_all_scheduler(5,  2,  0, os);
-   test_all_scheduler(5,  3,  0, os);
-   test_all_scheduler(5,  4,  0, os);
-   test_one_scheduler(5,  5, os);
+   test_all_scheduler(Scheduler(5,  1),  1, os);
+   test_all_scheduler(Scheduler(5,  2),  0, os);
+   test_all_scheduler(Scheduler(5,  3),  0, os);
+   test_all_scheduler(Scheduler(5,  4),  0, os);
+   test_one_scheduler(Scheduler(5,  5), os);
+
+   // Test more general cases
+   test_one_scheduler(Scheduler(2, 2, 3, 0, 3), os);
 }
 
 static Schedule::round_type make_round(const Schedule::group_type & g1, const Schedule::group_type & g2) {
@@ -163,4 +137,33 @@ static void test_schedule(std::ostream & os) {
       s.pop_round();
       BOOST_CHECK(0 == s.round_size());
    }
+}
+
+static bool files_match(const std::string & expected, const std::string & actual) {
+   std::ifstream expected_file(expected.c_str());
+   std::ifstream actual_file(actual.c_str());
+   BOOST_CHECK(expected_file.is_open());
+   BOOST_CHECK(actual_file.is_open());
+
+   bool match = true;
+   while(!expected_file.eof() && !actual_file.eof()) {
+      std::string expected_line;
+      std::string actual_line;
+      expected_file >> expected_line;
+      actual_file >> actual_line;
+
+      if(expected_line != actual_line) {
+         match = false;
+         break;
+      }
+   }
+
+   if(!expected_file.eof() || !actual_file.eof()) {
+      match = false;
+   }
+
+   actual_file.close();
+   expected_file.close();
+
+   return match;
 }

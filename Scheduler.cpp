@@ -41,7 +41,7 @@ Scheduler::Scheduler(size_t people, size_t groups, size_t rounds, size_t min, si
 #endif
 }
 
-size_t Scheduler::solve(eCount count) {
+size_t Scheduler::solve(eCount count) const {
    m_solutions.clear();
    if(m_rounds == 0) return 0;
 
@@ -70,11 +70,6 @@ size_t Scheduler::solve(eCount count) {
       }
       ASSERT(group->size() == m_people);
       round.push_back(group);
-
-      // Remove from group_comb, it is no longer valid, ASSUMING ONLY ONE ONE PAIRING
-      //group_set::const_iterator it = group_comb.find(group);
-      //ASSERT(it != group_comb.end());
-      //group_comb.erase(it);
    }
    ASSERT(round.size() == m_groups);
 
@@ -82,19 +77,20 @@ size_t Scheduler::solve(eCount count) {
    return solve_next_round(count, schedule, group_comb, group_comb.begin());
 }
 
-size_t Scheduler::solve_next_round(eCount count, Schedule & schedule, const group_set & group_comb, const group_set::const_iterator & first_group_it) {
+size_t Scheduler::solve_next_round(eCount count, Schedule & schedule, const group_set & group_comb, const group_set::const_iterator & first_group_it) const {
    if(m_rounds == schedule.round_size() && schedule.check(m_min, m_max)) {
       // we have a solution
       m_solutions.push_back(schedule);
       return 1;
    }
 
-   group_set group_comb_copy(first_group_it, group_comb.end(), group_comb.value_comp());
+   const group_set::const_iterator first = ((m_max > 1) ? group_comb.begin() : first_group_it); // optimization when players can't be in the same group more than once
+   group_set group_comb_copy(first, group_comb.end(), group_comb.value_comp());
    remove_invalid_groups(schedule, group_comb_copy);
    return solve_first_group_next_round(count, schedule, group_comb_copy);
 }
 
-size_t Scheduler::solve_first_group_next_round(eCount count, Schedule & schedule, const group_set & group_comb) {
+size_t Scheduler::solve_first_group_next_round(eCount count, Schedule & schedule, const group_set & group_comb) const {
    size_t solutions = 0;
    round_type round;
    group_set::const_iterator it = group_comb.begin();
@@ -108,7 +104,7 @@ size_t Scheduler::solve_first_group_next_round(eCount count, Schedule & schedule
    return solutions;
 }
 
-size_t Scheduler::solve_next_group(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur, const group_set::const_iterator & first_group_it) {
+size_t Scheduler::solve_next_group(eCount count, Schedule & schedule, round_type & round, const group_set & group_comb, group_set::const_iterator cur, const group_set::const_iterator & first_group_it) const {
    size_t solutions = 0;
 #ifdef UNKNOWN_OPTIMIZATION
    if(std::distance(it, group_comb.end()) < static_cast<int>(m_groups)) {
