@@ -10,7 +10,9 @@ Scheduler::Scheduler(size_t people, size_t groups)
 {
    // for now assume only everyone with everyone else exactly once
    m_rounds = ((m_people * m_groups) - 1) / (m_people - 1);
-   ASSERT((m_rounds * (m_people - 1) + 1) == (m_people * m_groups)); // Fix for cases like this to find best solution
+   if((m_rounds * (m_people - 1) + 1) != (m_people * m_groups)) {
+      m_rounds = 0;
+   }
 #ifdef DEBUG
    std::cout << "Required Rounds: " << m_rounds << std::endl;
 #endif
@@ -34,6 +36,7 @@ Scheduler::Scheduler(size_t people, size_t groups, size_t rounds, size_t min, si
 
 size_t Scheduler::solve(eCount count) {
    m_solutions.clear();
+   if(m_rounds == 0) return 0;
 
    // A set of groups ordered by the group members
    group_set group_comb([](const group_ptr & u, const group_ptr & v) -> bool {
