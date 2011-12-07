@@ -8,10 +8,17 @@
 Scheduler::Scheduler(size_t people, size_t groups)
    : m_people(people), m_groups(groups), m_min(1), m_max(1)
 {
-   // for now assume only everyone with everyone else exactly once
-   m_rounds = ((m_people * m_groups) - 1) / (m_people - 1);
-   if((m_rounds * (m_people - 1) + 1) != (m_people * m_groups)) {
+   if(m_people == 0 || m_people == 0) {
       m_rounds = 0;
+   } else if(m_people == 1 && m_groups == 1) {
+      m_rounds = 1;
+   } else if(m_people == 1) {
+      m_rounds = 0;
+   } else {
+      m_rounds = ((m_people * m_groups) - 1) / (m_people - 1);
+      if((m_rounds * (m_people - 1) + 1) != (m_people * m_groups)) {
+         m_rounds = 0;
+      }
    }
 #ifdef DEBUG
    std::cout << "Required Rounds: " << m_rounds << std::endl;
