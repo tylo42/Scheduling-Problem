@@ -1,4 +1,5 @@
 #include "DesignByContract.hpp"
+#include "MathUtils.hpp"
 #include "Schedule.hpp"
 
 #include <algorithm>
@@ -78,22 +79,6 @@ bool Schedule::valid_group(const group_type & group, size_t size) const {
    return true;
 }
 
-// should probably move these somewhere else
-static size_t fact(size_t n) {
-   if(n == 1) return 1;
-   return n * fact(n-1);
-}
-
-static size_t fall(size_t n, size_t m) {
-   if(m == 1) return n;
-   return n * fall(n-1, m-1);
-}
-
-
-static size_t comb(size_t n, size_t r) {
-   return fall(n, r) / fact(r);
-}
-
 bool Schedule::check(size_t min, size_t max) const {
    // check max
    pair_usage_map pair_map(pair_comp);
@@ -112,7 +97,8 @@ bool Schedule::check(size_t min, size_t max) const {
    // if max passes and minimum is less than 1 this works
    if(min<1) return true;
 
-   if(pair_map.size() < comb(m_groups*m_people, 2)) return false;
+   static const size_t combinations = MathUtils::comb(m_groups * m_people, 2);
+   if(pair_map.size() < combinations) return false;
    if(min == 1) return true;
    for(auto it = pair_map.begin(); it != pair_map.end(); ++it) {
       if(it->second < min) return false;

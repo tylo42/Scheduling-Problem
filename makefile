@@ -19,7 +19,7 @@ main.o: main.cpp Scheduler.hpp Schedule.hpp DesignByContract.hpp
 Scheduler.o: Scheduler.cpp Scheduler.hpp Schedule.hpp DesignByContract.hpp
 	$(CXX) -c Scheduler.cpp
 
-Schedule.o: Schedule.cpp Schedule.hpp DesignByContract.hpp
+Schedule.o: Schedule.cpp Schedule.hpp DesignByContract.hpp MathUtils.hpp
 	$(CXX) -c Schedule.cpp
 
 test: test_main.o Scheduler.o Schedule.o 
