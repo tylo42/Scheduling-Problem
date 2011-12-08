@@ -92,13 +92,22 @@ size_t Scheduler::solve_next_round(eCount count, Schedule & schedule, const grou
 
 size_t Scheduler::solve_first_group_next_round(eCount count, Schedule & schedule, const group_set & group_comb) const {
    size_t solutions = 0;
-   round_type round;
-   group_set::const_iterator it = group_comb.begin();
+   if(group_comb.empty()) return 0;
+
    // group_comb's groups are in lexicographic order, therefore all the groups containing 0 are at the begining
-   while(it != group_comb.end() && (*(*it))[0] == 0) {
-      round.push_back(*it);
-      ++it;
-      solutions += solve_next_group(count, schedule, round, group_comb, it, it);
+   group_set::const_iterator next = group_comb.begin();
+   while((*(*next))[0] == 0) {
+      next++;
+      if(next == group_comb.end()) return 0;
+   }
+
+   round_type round;
+   group_set::const_iterator first = group_comb.begin();
+   while(first != next) {
+      round.push_back(*first);
+      ++first;
+      solutions += solve_next_group(count, schedule, round, group_comb, next, first);
+      if(solutions > 0 && count == ONE) break;
       round.pop_back();
    }
    return solutions;
