@@ -58,18 +58,18 @@ bool Schedule::consistent() const {
    return true;
 }
 
-bool Schedule::valid_group(const group_type & group, size_t size) const {
+bool Schedule::valid_group(const group_type & group, size_t max) const {
    pair_usage_map pair_map(pair_comp);
    for(schedule_type::const_iterator s_it = m_schedule.begin(); s_it != m_schedule.end(); ++s_it) {
       for(round_type::const_iterator r_it = s_it->begin(); r_it != s_it->end(); ++r_it) {
          if(contain_same_pair(group, *(*r_it))) {
-            if(size == 1) {
+            if(max == 1) {
                return false;
             }
             pair_set group_pairs(pair_comp);
             matching_pairs(group, *(*r_it), group_pairs);
             for(pair_set::const_iterator it = group_pairs.begin(); it != group_pairs.end(); ++it) {
-               if(size < ++pair_map[*it]) {
+               if(max < ++pair_map[*it]) {
                   return false;
                }
             }
@@ -80,6 +80,9 @@ bool Schedule::valid_group(const group_type & group, size_t size) const {
 }
 
 bool Schedule::check(size_t min, size_t max) const {
+   // if max passes and minimum is less than 1 this works
+   if(min<1) return true;
+
    // check max
    pair_usage_map pair_map(pair_comp);
    for(schedule_type::const_iterator s_it = m_schedule.begin(); s_it != m_schedule.end(); ++s_it) {
@@ -93,9 +96,6 @@ bool Schedule::check(size_t min, size_t max) const {
          }
       }
    }
-
-   // if max passes and minimum is less than 1 this works
-   if(min<1) return true;
 
    static const size_t combinations = MathUtils::comb(m_groups * m_people, 2);
    if(pair_map.size() < combinations) return false;
